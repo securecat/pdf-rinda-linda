@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFリーダーリーダー</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">
+      <span class="title-pdf">PDF</span><span class="title-rr">リーダーリーダー</span>
+    </h1>
+  </header>
+
+  <main class="app-main">
+    <div id="state-no-pdf" class="state-panel" hidden>
+      <p class="state-message">PDFページで開いてください</p>
+    </div>
+
+    <div id="state-ready" class="state-panel">
+      <section class="section-range">
+        <fieldset class="range-fieldset">
+          <legend class="section-label">対象ページ</legend>
+
+          <label class="range-option">
+            <input type="radio" name="range-mode" value="single" checked>
+            <span>単一ページ</span>
+            <input type="number" id="page-single" class="page-input" value="1" min="1" aria-label="ページ番号">
+          </label>
+
+          <label class="range-option">
+            <input type="radio" name="range-mode" value="range">
+            <span>範囲指定</span>
+            <span class="range-inputs">
+              <input type="number" id="page-from" class="page-input page-input--small" value="1" min="1" aria-label="開始ページ">
+              <span class="range-sep">〜</span>
+              <input type="number" id="page-to" class="page-input page-input--small" value="1" min="1" aria-label="終了ページ">
+            </span>
+          </label>
+
+          <label class="range-option range-option--all">
+            <input type="checkbox" id="all-pages">
+            <span>全ページ</span>
+          </label>
+        </fieldset>
+      </section>
+
+      <section class="section-mode">
+        <p class="section-label">処理モード</p>
+        <div id="mode-indicator" class="mode-indicator">
+          <span id="mode-basic" class="mode-badge mode-badge--active">基本モード</span>
+          <span id="mode-ai" class="mode-badge" hidden>AIモード</span>
+        </div>
+        <p id="no-api-notice" class="notice-text">
+          OCR・画像解析にはAPIキーが必要です。
+          <a href="#" id="open-options" class="link">設定する →</a>
+        </p>
+        <p id="has-api-notice" class="notice-text" hidden>
+          AIモード: OCR・画像解析が有効です。
+        </p>
+      </section>
+
+      <button id="btn-run" class="btn-run" type="button">
+        <span class="btn-icon" aria-hidden="true">📖</span>
+        読み取り開始
+      </button>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <a href="#" id="footer-options" class="footer-link">⚙ 設定</a>
+  </footer>
+
+  <script src="popup.js" defer></script>
+</body>
+</html>

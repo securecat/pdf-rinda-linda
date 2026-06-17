@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFリーダーリーダー</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <header class="sp-header">
+    <div class="sp-header-left">
+      <h1 class="sp-title">
+        <span class="sp-title-pdf">PDF</span>リーダーリーダー
+      </h1>
+    </div>
+    <div class="sp-header-right">
+      <button id="btn-speak" class="icon-btn" title="読み上げ" aria-label="読み上げ" disabled>
+        <span aria-hidden="true">🔊</span>
+      </button>
+      <button id="btn-stop" class="icon-btn" title="停止" aria-label="読み上げ停止" hidden>
+        <span aria-hidden="true">⏹</span>
+      </button>
+      <button id="btn-copy" class="icon-btn" title="Markdownをコピー" aria-label="Markdownをコピー" disabled>
+        <span aria-hidden="true">📋</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- アクセスコスト表示 -->
+  <div id="cost-panel" class="cost-panel" hidden>
+    <div class="cost-main">
+      <span class="cost-label">アクセスコスト</span>
+      <span id="cost-value" class="cost-value">0</span>
+    </div>
+    <div id="cost-breakdown" class="cost-breakdown"></div>
+  </div>
+
+  <!-- 進捗表示 -->
+  <div id="progress-panel" class="progress-panel" hidden>
+    <div class="progress-spinner" aria-hidden="true"></div>
+    <p id="progress-message" class="progress-message">準備中…</p>
+  </div>
+
+  <!-- エラー表示 -->
+  <div id="error-panel" class="error-panel" hidden>
+    <p class="error-icon" aria-hidden="true">⚠️</p>
+    <p id="error-message" class="error-message"></p>
+  </div>
+
+  <!-- 待機状態 -->
+  <div id="idle-panel" class="idle-panel">
+    <p class="idle-text">Popupから読み取り開始してください</p>
+  </div>
+
+  <!-- Markdownレンダリング出力 -->
+  <main id="output-panel" class="output-panel" hidden aria-live="polite">
+    <div id="md-output" class="md-output"></div>
+  </main>
+
+  <script src="sidepanel.js" type="module" defer></script>
+</body>
+</html>

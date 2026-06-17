@@ -1,0 +1,248 @@
+/* popup.css */
+:root {
+  --c-bg: #1a1a1f;
+  --c-surface: #24242c;
+  --c-border: #38383f;
+  --c-text: #e8e8ec;
+  --c-text-sub: #9090a0;
+  --c-accent: #4ecdc4;
+  --c-accent-dim: #2a5c58;
+  --c-danger: #ff6b6b;
+  --radius: 6px;
+  --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 280px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ヘッダー */
+.app-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.app-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.title-pdf {
+  color: var(--c-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  vertical-align: baseline;
+  margin-right: 2px;
+}
+
+.title-rr {
+  color: var(--c-text);
+}
+
+/* メイン */
+.app-main {
+  padding: 14px 16px;
+}
+
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.state-message {
+  color: var(--c-text-sub);
+  font-size: 12px;
+  text-align: center;
+  padding: 16px 0;
+}
+
+/* ページ範囲 */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-text-sub);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+  border: none;
+  padding: 0;
+}
+
+.range-fieldset {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.range-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--c-text);
+}
+
+.range-option input[type="radio"],
+.range-option input[type="checkbox"] {
+  accent-color: var(--c-accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.range-option--all {
+  padding-top: 4px;
+  border-top: 1px solid var(--c-border);
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.range-sep {
+  color: var(--c-text-sub);
+  font-size: 11px;
+}
+
+.page-input {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 2px 6px;
+  width: 56px;
+  text-align: center;
+}
+
+.page-input--small {
+  width: 44px;
+}
+
+.page-input:focus {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 1px;
+  border-color: var(--c-accent);
+}
+
+/* モード */
+.section-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mode-indicator {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--c-border);
+  color: var(--c-text-sub);
+}
+
+.mode-badge--active {
+  background: var(--c-accent-dim);
+  color: var(--c-accent);
+}
+
+.notice-text {
+  font-size: 11px;
+  color: var(--c-text-sub);
+  line-height: 1.6;
+}
+
+.link {
+  color: var(--c-accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* 実行ボタン */
+.btn-run {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: var(--c-accent);
+  color: #0d2b29;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  letter-spacing: 0.03em;
+}
+
+.btn-run:hover {
+  opacity: 0.88;
+}
+
+.btn-run:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
+.btn-run:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+/* フッター */
+.app-footer {
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--c-border);
+  text-align: right;
+}
+
+.footer-link {
+  font-size: 11px;
+  color: var(--c-text-sub);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--c-text);
+}
+
+/* hidden */
+[hidden] {
+  display: none !important;
+}
