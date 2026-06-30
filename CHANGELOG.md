@@ -5,6 +5,12 @@
 形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) に準拠し、
 バージョン管理は [Semantic Versioning](https://semver.org/lang/ja/) に従います。
 
+## [0.2.2] - 2026-06-18
+
+### 修正
+
+- テキストレイヤーのCMap文字化けがClaudeの出力に混入する問題を修正（Claudeに渡す前にASCII文字のみ抽出）
+
 ## [0.2.1] - 2026-06-18
 
 ### 修正
