@@ -2,31 +2,40 @@
 
 const $ = (sel) => document.querySelector(sel);
 
-async function init() {
-  // APIキー確認
-  const { apiKey } = await chrome.storage.local.get('apiKey');
-  const hasApi = Boolean(apiKey);
+function bindOptionsLinks() {
+  $('#footer-options').addEventListener('click', (e) => {
+    e.preventDefault();
+    chrome.runtime.openOptionsPage();
+    window.close();
+  });
+}
 
-  if (hasApi) {
-    $('#mode-basic').classList.remove('mode-badge--active');
-    $('#mode-ai').removeAttribute('hidden');
-    $('#mode-ai').classList.add('mode-badge--active');
-    $('#no-api-notice').hidden = true;
-    $('#has-api-notice').hidden = false;
+async function init() {
+  const { apiKey } = await chrome.storage.local.get('apiKey');
+
+  if (!apiKey) {
+    $('#state-no-api').hidden = false;
+    $('#btn-setup').addEventListener('click', () => {
+      chrome.runtime.openOptionsPage();
+      window.close();
+    });
+    bindOptionsLinks();
+    return;
   }
 
-  // 現在タブがPDFかチェック
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const url = tab?.url || '';
   const isPdf = url.endsWith('.pdf') || url.includes('.pdf?') || tab?.title?.endsWith('.pdf');
 
   if (!isPdf) {
-    $('#state-ready').hidden = true;
     $('#state-no-pdf').hidden = false;
+    bindOptionsLinks();
     return;
   }
 
-  // ページ範囲UI制御
+  $('#state-ready').hidden = false;
+  bindOptionsLinks();
+
   const radios = document.querySelectorAll('input[name="range-mode"]');
   const allCheck = $('#all-pages');
   const singleInput = $('#page-single');
@@ -43,19 +52,6 @@ async function init() {
 
   allCheck.addEventListener('change', updateRangeState);
 
-  // オプション画面を開く
-  $('#open-options')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    chrome.runtime.openOptionsPage();
-    window.close();
-  });
-  $('#footer-options').addEventListener('click', (e) => {
-    e.preventDefault();
-    chrome.runtime.openOptionsPage();
-    window.close();
-  });
-
-  // 実行ボタン
   $('#btn-run').addEventListener('click', async () => {
     const isAll = allCheck.checked;
     let pageRange;
@@ -74,20 +70,16 @@ async function init() {
       }
     }
 
-    // storageに処理依頼を書く（window.close()前に必ず完了させる）
     await chrome.storage.local.set({
       pendingJob: {
         url: tab.url,
         tabId: tab.id,
         pageRange,
-        hasApi,
         timestamp: Date.now(),
       },
     });
 
-    // Side Panelを開く
     await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
-
     window.close();
   });
 }

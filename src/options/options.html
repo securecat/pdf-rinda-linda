@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>設定 - PDFリーダーリーダー</title>
+  <title>設定 - PDFリンダリンダ</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <div class="options-wrap">
     <header class="options-header">
       <h1 class="options-title">
-        <span class="title-pdf">PDF</span>リーダーリーダー <span class="title-sub">設定</span>
+        <span class="title-pdf">PDF</span>リンダリンダ <span class="title-sub">設定</span>
       </h1>
     </header>
 
@@ -18,7 +18,7 @@
       <section class="section">
         <h2 class="section-title">Anthropic APIキー</h2>
         <p class="section-desc">
-          OCR・画像解析・Markdown構造化にはAnthropicのAPIキーが必要です。
+          PDFリンダリンダの利用にはAnthropicのAPIキーが必要です。
           キーはお使いのブラウザのローカルストレージにのみ保存され、外部サーバーには送信されません。
         </p>
         <p class="section-desc">
@@ -48,52 +48,12 @@
       </section>
 
       <section class="section">
-        <h2 class="section-title">処理モードについて</h2>
-        <div class="mode-table">
-          <div class="mode-row mode-row--head">
-            <span>機能</span>
-            <span>APIキーなし</span>
-            <span>APIキーあり</span>
-          </div>
-          <div class="mode-row">
-            <span>テキストレイヤー抽出</span>
-            <span class="badge badge--ok">✓</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-          <div class="mode-row">
-            <span>画像内テキストOCR</span>
-            <span class="badge badge--no">—</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-          <div class="mode-row">
-            <span>画像・図版の内容説明</span>
-            <span class="badge badge--no">—</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-          <div class="mode-row">
-            <span>Markdown構造化（AI）</span>
-            <span class="badge badge--no">—</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-          <div class="mode-row">
-            <span>読み上げ</span>
-            <span class="badge badge--ok">✓</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-          <div class="mode-row">
-            <span>アクセスコスト表示</span>
-            <span class="badge badge--ok">✓</span>
-            <span class="badge badge--ok">✓</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
         <h2 class="section-title">このツールについて</h2>
         <p class="section-desc">
-          PDFリーダーリーダーは、テキスト情報の有無に関わらずどんなPDFでも読めるようにするChrome拡張です。
-          「アクセスコスト」は、そのPDFを読み取るためにかかった処理コストの指標であり、
-          数値が高いほどPDFのアクセシビリティが低いことを意味します。
+          PDFリンダリンダは、テキストレイヤーの有無にかかわらず、どんなPDFでも誰もが読めるようにするChrome拡張です。PDFページをAIが画像として解析し、構造化されたMarkdownを出力します。
+        </p>
+        <p class="section-desc">
+          「アクセスコスト」はページ単位で表示されます。数値が高いほど、そのページのアクセシビリティが低いことを意味します。
         </p>
         <p class="section-desc version-text">v0.1.2</p>
       </section>

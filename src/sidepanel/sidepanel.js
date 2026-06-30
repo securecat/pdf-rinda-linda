@@ -1,16 +1,13 @@
 // sidepanel.js
 import { extractPdfData } from '../lib/pdf-processor.js';
-import { analyzePageWithAI, textLayerToMarkdown } from '../lib/claude-api.js';
+import { analyzePageWithAI } from '../lib/claude-api.js';
 
 const $ = (sel) => document.querySelector(sel);
+const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// 状態
 let currentMarkdown = '';
-let totalCost = 0;
 let speechUtterance = null;
-const costBreakdown = [];
 
-// UI要素
 const progressPanel = $('#progress-panel');
 const progressMessage = $('#progress-message');
 const errorPanel = $('#error-panel');
@@ -18,9 +15,6 @@ const errorMessage = $('#error-message');
 const idlePanel = $('#idle-panel');
 const outputPanel = $('#output-panel');
 const mdOutput = $('#md-output');
-const costPanel = $('#cost-panel');
-const costValue = $('#cost-value');
-const costBreakdownEl = $('#cost-breakdown');
 const btnSpeak = $('#btn-speak');
 const btnStop = $('#btn-stop');
 const btnCopy = $('#btn-copy');
@@ -43,33 +37,51 @@ function showError(msg) {
   errorMessage.textContent = msg;
 }
 
-// --- アクセスコスト表示 ---
-function updateCost(delta, reason) {
-  totalCost += delta;
-  costPanel.hidden = false;
-  costValue.textContent = totalCost;
+// --- ページヘッダー（コスト表示） ---
+function buildPageHeader(pageData, isFirst) {
+  const { pageNum, hasTextLayer, images } = pageData;
 
-  if (totalCost >= 60) {
-    costValue.dataset.level = 'high';
-  } else if (totalCost >= 25) {
-    costValue.dataset.level = 'medium';
-  } else {
-    costValue.dataset.level = '';
+  const breakdown = [];
+  let cost = 0;
+
+  if (!hasTextLayer) {
+    cost += 30;
+    breakdown.push({ delta: 30, reason: 'テキストレイヤーなし', warn: true });
+  }
+  const imgCount = images.reduce((s, img) => s + (img.count || 0), 0);
+  if (imgCount > 0) {
+    const delta = imgCount * 5;
+    cost += delta;
+    breakdown.push({ delta, reason: `画像 ${imgCount}枚`, warn: false });
+  }
+  const noAltCount = images.filter((img) => !img.altText).length;
+  if (noAltCount > 0) {
+    const delta = noAltCount * 10;
+    cost += delta;
+    breakdown.push({ delta, reason: `alt無し ${noAltCount}枚`, warn: true });
   }
 
-  if (reason) {
-    costBreakdown.push({ delta, reason });
-    const tag = document.createElement('span');
-    tag.className = `cost-tag ${delta >= 10 ? 'cost-tag--warn' : ''}`;
-    tag.textContent = `+${delta} ${reason}`;
-    costBreakdownEl.appendChild(tag);
-  }
+  const level = cost >= 60 ? 'high' : cost >= 25 ? 'medium' : '';
+  const tagsHtml = breakdown.map((b) =>
+    `<span class="cost-tag ${b.warn ? 'cost-tag--warn' : ''}">+${b.delta} ${b.reason}</span>`
+  ).join('');
+
+  const sep = isFirst ? '' : '<div class="page-sep" aria-hidden="true"></div>';
+
+  return `${sep}<div class="page-header">
+    <div class="page-header-top">
+      <span class="page-header-num">ページ ${pageNum}</span>
+      <div class="page-header-cost-area">
+        <span class="page-cost-label">コスト</span>
+        <span class="page-cost-value" data-level="${level}">${cost}</span>
+      </div>
+    </div>
+    ${tagsHtml ? `<div class="page-cost-tags">${tagsHtml}</div>` : ''}
+  </div>`;
 }
 
-// --- Markdownレンダリング（依存ライブラリなし） ---
+// --- Markdownレンダリング ---
 function renderMarkdown(md) {
-  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
   let html = '';
   const lines = md.split('\n');
   let inList = false;
@@ -157,23 +169,21 @@ function inlineMarkdown(text) {
 
 // --- メイン処理 ---
 async function processPdf(payload) {
-  // 同じジョブを2回処理しないようタイムスタンプを記録
   const { lastProcessedTs } = await chrome.storage.local.get('lastProcessedTs');
   if (lastProcessedTs === payload.timestamp) return;
   await chrome.storage.local.set({ lastProcessedTs: payload.timestamp });
 
-  const { url, pageRange, hasApi } = payload;
-  totalCost = 0;
-  costBreakdown.length = 0;
-  costBreakdownEl.innerHTML = '';
-  costPanel.hidden = true;
+  const { url, pageRange } = payload;
   currentMarkdown = '';
   mdOutput.innerHTML = '';
   btnSpeak.disabled = true;
   btnCopy.disabled = true;
 
   const { apiKey } = await chrome.storage.local.get('apiKey');
-  const useApi = hasApi && Boolean(apiKey);
+  if (!apiKey) {
+    showError('APIキーが設定されていません。設定画面からAnthropicのAPIキーを登録してください。');
+    return;
+  }
 
   try {
     const { pages } = await extractPdfData(url, pageRange, (msg) => {
@@ -185,47 +195,25 @@ async function processPdf(payload) {
 
     for (let i = 0; i < pages.length; i++) {
       const pageData = pages[i];
-      const { pageNum, rawText, hasTextLayer, images } = pageData;
+      const { pageNum, rawText } = pageData;
 
-      if (i > 0) {
-        mdOutput.insertAdjacentHTML('beforeend', `
-          <div class="page-divider">
-            <div class="page-divider-line"></div>
-            <span class="page-divider-label">ページ ${pageNum}</span>
-            <div class="page-divider-line"></div>
-          </div>
-        `);
-      }
+      mdOutput.insertAdjacentHTML('beforeend', buildPageHeader(pageData, i === 0));
 
-      if (!hasTextLayer) updateCost(30, 'テキストレイヤーなし');
-      const imgCount = images.reduce((s, img) => s + (img.count || 0), 0);
-      if (imgCount > 0) updateCost(imgCount * 5, `画像${imgCount}枚`);
-      const noAltCount = images.filter((img) => !img.altText).length;
-      if (noAltCount > 0) updateCost(noAltCount * 10, `alt無し${noAltCount}枚`);
-
-      let pageMarkdown = '';
-
-      if (useApi) {
-        setProgress(`ページ ${pageNum} をAI解析中…`);
-        try {
-          const result = await analyzePageWithAI(apiKey, pageData, rawText);
-          pageMarkdown = result.markdown;
-          if (result.costDelta > 0) updateCost(result.costDelta, 'AI処理');
-        } catch (apiErr) {
-          console.error('AI解析エラー:', apiErr);
-          pageMarkdown = textLayerToMarkdown(rawText, pageData.textItems);
-          updateCost(5, 'AI失敗→フォールバック');
-        }
-      } else {
-        pageMarkdown = textLayerToMarkdown(rawText, pageData.textItems);
-        if (!hasTextLayer) {
-          pageMarkdown = '*（テキストレイヤーなし。AIモードでOCR解析が可能です）*';
-        }
-      }
-
-      allMarkdownParts.push(pageMarkdown);
-      mdOutput.insertAdjacentHTML('beforeend', renderMarkdown(pageMarkdown));
+      setProgress(`ページ ${pageNum} をAI解析中…`);
       showState('output');
+
+      try {
+        const result = await analyzePageWithAI(apiKey, pageData, rawText);
+        allMarkdownParts.push(result.markdown);
+        mdOutput.insertAdjacentHTML('beforeend', renderMarkdown(result.markdown));
+      } catch (apiErr) {
+        console.error(`ページ ${pageNum} AI解析エラー:`, apiErr);
+        mdOutput.insertAdjacentHTML(
+          'beforeend',
+          `<p class="page-error">ページ ${pageNum} の解析に失敗しました: ${esc(apiErr.message)}</p>`
+        );
+        allMarkdownParts.push('');
+      }
     }
 
     currentMarkdown = allMarkdownParts.join('\n\n---\n\n');
@@ -290,17 +278,15 @@ btnCopy.addEventListener('click', async () => {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.pendingJob?.newValue) {
     const job = changes.pendingJob.newValue;
-    if (Date.now() - job.timestamp > 5000) return; // 5秒以上古いジョブは無視
+    if (Date.now() - job.timestamp > 5000) return;
     processPdf(job);
   }
 });
 
-// Side Panel表示時点でpendingJobが既にあれば即処理
 chrome.storage.local.get('pendingJob').then(({ pendingJob }) => {
   if (pendingJob && Date.now() - pendingJob.timestamp < 5000) {
     processPdf(pendingJob);
   }
 });
 
-// 初期状態
 showState('idle');

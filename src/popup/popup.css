@@ -70,6 +70,49 @@ body {
   padding: 16px 0;
 }
 
+/* APIキーなし状態 */
+.no-api-desc {
+  font-size: 12px;
+  color: var(--c-text-sub);
+  line-height: 1.7;
+  padding-top: 4px;
+}
+
+.link-github {
+  font-size: 12px;
+  color: var(--c-accent);
+  text-decoration: none;
+}
+
+.link-github:hover {
+  text-decoration: underline;
+}
+
+.btn-setup {
+  display: block;
+  width: 100%;
+  padding: 9px;
+  background: var(--c-accent-dim);
+  color: var(--c-accent);
+  border: 1px solid var(--c-accent);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+
+.btn-setup:hover {
+  opacity: 0.85;
+}
+
+.btn-setup:focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+}
+
 /* ページ範囲 */
 .section-label {
   font-size: 11px;
@@ -146,47 +189,6 @@ body {
   border-color: var(--c-accent);
 }
 
-/* モード */
-.section-mode {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.mode-indicator {
-  display: flex;
-  gap: 6px;
-}
-
-.mode-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 20px;
-  background: var(--c-border);
-  color: var(--c-text-sub);
-}
-
-.mode-badge--active {
-  background: var(--c-accent-dim);
-  color: var(--c-accent);
-}
-
-.notice-text {
-  font-size: 11px;
-  color: var(--c-text-sub);
-  line-height: 1.6;
-}
-
-.link {
-  color: var(--c-accent);
-  text-decoration: none;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
 /* 実行ボタン */
 .btn-run {
   display: flex;
@@ -242,7 +244,6 @@ body {
   color: var(--c-text);
 }
 
-/* hidden */
 [hidden] {
   display: none !important;
 }

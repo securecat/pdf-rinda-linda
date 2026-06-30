@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDFリーダーリーダー</title>
+  <title>PDFリンダリンダ</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <header class="app-header">
     <h1 class="app-title">
-      <span class="title-pdf">PDF</span><span class="title-rr">リーダーリーダー</span>
+      <span class="title-pdf">PDF</span><span class="title-rr">リンダリンダ</span>
     </h1>
   </header>
 
   <main class="app-main">
+    <!-- APIキーなし -->
+    <div id="state-no-api" class="state-panel" hidden>
+      <p class="no-api-desc">どんなPDFでも読めるようにするChrome拡張です。利用にはAnthropicのAPIキーが必要です。</p>
+      <a href="https://github.com/securecat/pdf-rinda-linda" target="_blank" rel="noopener" class="link-github">詳しくはGitHubリポジトリ →</a>
+      <button id="btn-setup" class="btn-setup" type="button">APIキーを設定する</button>
+    </div>
+
+    <!-- PDFページ以外 -->
     <div id="state-no-pdf" class="state-panel" hidden>
       <p class="state-message">PDFページで開いてください</p>
     </div>
 
-    <div id="state-ready" class="state-panel">
+    <!-- 準備OK -->
+    <div id="state-ready" class="state-panel" hidden>
       <section class="section-range">
         <fieldset class="range-fieldset">
           <legend class="section-label">対象ページ</legend>
@@ -44,21 +53,6 @@
             <span>全ページ</span>
           </label>
         </fieldset>
-      </section>
-
-      <section class="section-mode">
-        <p class="section-label">処理モード</p>
-        <div id="mode-indicator" class="mode-indicator">
-          <span id="mode-basic" class="mode-badge mode-badge--active">基本モード</span>
-          <span id="mode-ai" class="mode-badge" hidden>AIモード</span>
-        </div>
-        <p id="no-api-notice" class="notice-text">
-          OCR・画像解析にはAPIキーが必要です。
-          <a href="#" id="open-options" class="link">設定する →</a>
-        </p>
-        <p id="has-api-notice" class="notice-text" hidden>
-          AIモード: OCR・画像解析が有効です。
-        </p>
       </section>
 
       <button id="btn-run" class="btn-run" type="button">
