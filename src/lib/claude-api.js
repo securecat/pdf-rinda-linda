@@ -45,7 +45,11 @@ export async function analyzePageWithAI(apiKey, pageData, rawText) {
   let instruction = `これはPDFの${pageNum}ページ目の画像です。画像からすべてのテキストを正確に読み取ってMarkdown化してください。\n\n`;
 
   if (hasTextLayer && rawText.trim()) {
-    instruction += `以下はPDFのテキストレイヤーから取得した補助情報です。日本語が欠落している場合があるため、テキストの読み取りは必ず画像を優先してください。英数字・記号・コード等の正確な表記の確認にのみ使用してください：\n\`\`\`\n${rawText.slice(0, 4000)}\n\`\`\`\n\n`;
+    // 日本語PDFはCMapデコード失敗で日本語が文字化けするため、ASCII文字のみ抽出して渡す
+    const asciiText = rawText.replace(/[^\x00-\x7F\n\r]/g, '').replace(/\n{3,}/g, '\n\n').trim();
+    if (asciiText) {
+      instruction += `以下はPDFのテキストレイヤーから取得したASCII文字の補助情報です。英数字・記号・ページ番号・コード等の正確な表記の確認にのみ使ってください。日本語テキストはすべて画像から読み取ってください：\n\`\`\`\n${asciiText.slice(0, 2000)}\n\`\`\`\n\n`;
+    }
   }
 
   if (imgCount > 0) {
