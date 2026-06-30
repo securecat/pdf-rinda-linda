@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PDFリンダリンダ",
-  "version": "0.1.2",
+  "version": "0.2.1",
   "description": "どんなPDFでも読めるようにするPDFリーダー界のリーダー。PDFリーダーリーダー、転じてPDFリンダリンダといいます。",
   "permissions": [
     "activeTab",
