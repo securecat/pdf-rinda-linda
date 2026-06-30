@@ -42,12 +42,10 @@ export async function analyzePageWithAI(apiKey, pageData, rawText) {
     },
   });
 
-  let instruction = `これはPDFの${pageNum}ページ目の画像です。ページ全体の構造（見出し・段落・表・画像の位置関係）を把握するために使用してください。\n\n`;
+  let instruction = `これはPDFの${pageNum}ページ目の画像です。画像からすべてのテキストを正確に読み取ってMarkdown化してください。\n\n`;
 
   if (hasTextLayer && rawText.trim()) {
-    instruction += `PDFのテキストレイヤーから取得したテキストは以下のとおりです。このテキストをそのまま使用し、上記の画像で確認した文書構造に従ってMarkdown化してください：\n\`\`\`\n${rawText.slice(0, 4000)}\n\`\`\`\n\n`;
-  } else {
-    instruction += 'このページにはテキストレイヤーがありません。画像からすべてのテキストをOCRして読み取ってください。\n\n';
+    instruction += `以下はPDFのテキストレイヤーから取得した補助情報です。日本語が欠落している場合があるため、テキストの読み取りは必ず画像を優先してください。英数字・記号・コード等の正確な表記の確認にのみ使用してください：\n\`\`\`\n${rawText.slice(0, 4000)}\n\`\`\`\n\n`;
   }
 
   if (imgCount > 0) {
