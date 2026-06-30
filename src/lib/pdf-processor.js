@@ -83,15 +83,38 @@ async function extractPageData(pdf, pageNum) {
     // タグ付きPDFでない場合はnull
   }
 
-  // 3. 画像をCanvasでキャプチャ（ページ全体をbase64化）
-  const viewport = page.getViewport({ scale: 2.0 }); // 高解像度
+  // 3. 画像をCanvasでキャプチャ
+  const viewport = page.getViewport({ scale: 3.0 }); // 高解像度
   const canvas = new OffscreenCanvas(viewport.width, viewport.height);
   const context = canvas.getContext('2d');
 
   await page.render({ canvasContext: context, viewport }).promise;
 
-  const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.85 });
-  const pageImageBase64 = await blobToBase64(blob);
+  // 横長ページ（見開き等）は左右分割して各半分を高解像度で渡す
+  const isWide = viewport.width > viewport.height * 1.2;
+  let pageImageBase64 = null;
+  let sectionImages = [];
+
+  if (isWide) {
+    const halfW = Math.floor(viewport.width / 2);
+    const rightW = viewport.width - halfW;
+
+    const leftCanvas = new OffscreenCanvas(halfW, viewport.height);
+    leftCanvas.getContext('2d').drawImage(canvas, 0, 0, halfW, viewport.height, 0, 0, halfW, viewport.height);
+    const leftBlob = await leftCanvas.convertToBlob({ type: 'image/jpeg', quality: 0.92 });
+
+    const rightCanvas = new OffscreenCanvas(rightW, viewport.height);
+    rightCanvas.getContext('2d').drawImage(canvas, halfW, 0, rightW, viewport.height, 0, 0, rightW, viewport.height);
+    const rightBlob = await rightCanvas.convertToBlob({ type: 'image/jpeg', quality: 0.92 });
+
+    sectionImages = [
+      { base64: await blobToBase64(leftBlob), label: '左半分' },
+      { base64: await blobToBase64(rightBlob), label: '右半分' },
+    ];
+  } else {
+    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.92 });
+    pageImageBase64 = await blobToBase64(blob);
+  }
 
   // 4. 個別画像オブジェクトとそのalt属性を取得
   const operatorList = await page.getOperatorList();
@@ -107,6 +130,7 @@ async function extractPageData(pdf, pageNum) {
     textItems,
     structTree,
     pageImageBase64,
+    sectionImages,
     images,
     baseCost,
   };
